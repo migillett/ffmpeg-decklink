@@ -32,6 +32,10 @@ fi
 
 if [ "$#" -ge 2 ]; then
   DURATION=$2
+  if ! [[ $DURATION =~ ^[0-9]+$ ]]; then
+    echo "Error: Record duration must be an integer."
+    exit 1
+  fi
   echo "Record duration set to ${DURATION} minutes"
 fi
 
