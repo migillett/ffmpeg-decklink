@@ -64,7 +64,7 @@ COMMAND="ffmpeg -hide_banner -y \
 -i \"${DEVICE}\""
 
 if [ "$DURATION" != 0 ]; then
-    DURATION = DURATION * 60 # convert minutes to seconds
+    DURATION=$((DURATION * 60)) # convert minutes to seconds
     COMMAND="${COMMAND} -t $DURATION"
 fi
 
