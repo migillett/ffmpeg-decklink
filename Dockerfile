@@ -8,7 +8,7 @@ WORKDIR /home
 COPY    BMD_SDK/Linux/include /root/ffmpeg_sources/BMD_SDK/
 COPY    BMD_DesktopVideo/deb/x86_64/desktopvideo_*_amd64.deb /root/BMD/
 
-COPY    ./utils/* .
+COPY    ./utils/ .
 RUN     chmod +x ./*.sh
 
 RUN     apt-get -yqq update && \
