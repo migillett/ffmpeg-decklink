@@ -3,8 +3,6 @@
 
 FROM    ubuntu:20.04 AS base
 
-WORKDIR /tmp/workdir
-
 COPY    BMD_SDK/Linux/include /root/ffmpeg_sources/BMD_SDK/
 COPY    BMD_DesktopVideo/deb/x86_64/desktopvideo_*_amd64.deb /root/BMD/
 
