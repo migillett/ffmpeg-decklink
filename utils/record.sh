@@ -2,13 +2,13 @@
 
 ### DESCRIPTION ###
 # records video from capture card
-# run this script by doing `./record.sh {RECORDING_NAME} {record_duration_minutes: integer}`
+# run this script by doing `./record.sh {recording_name} {record_duration_minutes: integer}`
 # for example:
     # ./record.sh tape_01 120
 
 ### DEFAULT VALUES ###
-RECORDING_NAME="recording"
-DURATION=0
+recording_name="recording"
+duration=0
 
 ### ENVIRONMENT VARIABLE CHECKS ###
 if [[ -v DEVICE ]]; then
@@ -27,57 +27,57 @@ fi
 
 ### ARGUMENT CHECKS ###
 if [ "$#" -ge 1 ]; then
-  RECORDING_NAME="$1"
+  recording_name="$1"
 fi
 
 if [ "$#" -ge 2 ]; then
-  DURATION=$2
-  if ! [[ $DURATION =~ ^[0-9]+$ ]]; then
+  duration=$2
+  if ! [[ $duration =~ ^[0-9]+$ ]]; then
     echo "Error: Record duration must be an integer."
     exit 1
   fi
-  echo "Record duration set to ${DURATION} minutes"
+  echo "Record duration set to ${duration} minutes"
 fi
 
 # get the format of incoming video
-PROBE_RESPONSE=$(ffprobe -hide_banner \
+probe_response=$(ffprobe -hide_banner \
 -f decklink \
 -i "${DEVICE}" \
 -select_streams v:0 \
 -video_input ${INPUT_TYPE} \
 -audio_input embedded \
--show_entries stream=width,height,r_frame_rate,field_order \
+-show_entries stream=width,height,r_frame_rate,pix_fmt \
 -of default=noprint_wrappers=1:nokey=1 -v quiet)
 
-width=$(echo "$PROBE_RESPONSE" | awk 'NR==1')
-height=$(echo "$PROBE_RESPONSE" | awk 'NR==2')
-field_order=$(echo "$PROBE_RESPONSE" | awk 'NR==3')
-r_frame_rate=$(echo "$PROBE_RESPONSE" | awk 'NR==4')
+width=$(echo "$probe_response" | awk 'NR==1')
+height=$(echo "$probe_response" | awk 'NR==2')
+pixel_format=$(echo "$probe_response" | awk 'NR==3')
+r_frame_rate=$(echo "$probe_response" | awk 'NR==4')
 
 echo "Source dimensions: ${width}x${height} at ${r_frame_rate} fps"
 
-FORMAT_CODE=$(grep "${width}x${height} at ${r_frame_rate} fps" ./formats.txt | awk '{print $1}')
-echo "Input format code: ${FORMAT_CODE}"
+format_code=$(grep "${width}x${height} at ${r_frame_rate} fps" ./formats.txt | awk '{print $1}')
+echo "Input format code: ${format_code}"
 
-COMMAND="ffmpeg -hide_banner -y \
--format_code $FORMAT_CODE \
+command="ffmpeg -hide_banner -y \
+-format_code $format_code \
 -f decklink \
 -video_input $INPUT_TYPE \
 -audio_input embedded \
--raw_format argb \
+-raw_format $pixel_format \
 -i \"${DEVICE}\""
 
-if [ "$DURATION" != 0 ]; then
-    DURATION=$((DURATION * 60)) # convert minutes to seconds
-    COMMAND="${COMMAND} -t $DURATION"
+if [ "$duration" != 0 ]; then
+    duration=$((duration * 60)) # convert minutes to seconds
+    command="${command} -t $duration"
 fi
 
 TIMESTAMP=$(date +"%Y-%m-%d_%H%M%S")
-RECORD_PATH="/media/${TIMESTAMP}_${RECORDING_NAME}.mkv"
+RECORD_PATH="/media/${TIMESTAMP}_${recording_name}.mkv"
 
 echo "Recording destination set to: $RECORD_PATH"
 
-COMMAND="${COMMAND} \
+command="${command} \
 -c:v libx264 \
 -preset ultrafast \
 -crf 18 \
@@ -85,5 +85,5 @@ COMMAND="${COMMAND} \
 -profile:v main \
 -c:a aac \"${RECORD_PATH}\""
 
-echo "Running ffmpeg command: $COMMAND"
-eval "${COMMAND}"
+echo "Running ffmpeg command: $command"
+eval "${command}"
