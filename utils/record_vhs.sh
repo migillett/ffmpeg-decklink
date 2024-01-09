@@ -66,7 +66,7 @@ command="ffmpeg -hide_banner -y \
 -audio_input embedded \
 -raw_format $pixel_format \
 -i \"${DEVICE}\"" \
--vf "scale=640:480,setsar=1:1"
+-vf \"scale=640:480,setsar=1:1\""
 
 if [ "$duration" != 0 ]; then
     duration=$((duration * 60)) # convert minutes to seconds
