@@ -65,7 +65,7 @@ command="ffmpeg -hide_banner -y \
 -video_input $INPUT_TYPE \
 -audio_input embedded \
 -raw_format $pixel_format \
--i \"${DEVICE}\"" \
+-i \"${DEVICE}\" \
 -vf \"scale=640:480,setsar=1:1\""
 
 if [ "$duration" != 0 ]; then
