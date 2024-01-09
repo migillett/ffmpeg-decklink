@@ -54,6 +54,10 @@ height=$(echo "$probe_response" | awk 'NR==2')
 pixel_format=$(echo "$probe_response" | awk 'NR==3')
 r_frame_rate=$(echo "$probe_response" | awk 'NR==4')
 
+if [ "$pixel_format" == "0rgb" ]; then
+  $pixel_format="argb"
+fi
+
 echo "Source dimensions: ${width}x${height} at ${r_frame_rate} fps"
 
 format_code=$(grep "${width}x${height} at ${r_frame_rate} fps" ./formats.txt | awk '{print $1}')
